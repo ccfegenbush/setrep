@@ -3,35 +3,36 @@
 import { supabase } from "@/lib/supabase";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Header from "@/components/Header";
 
 type Template = {
   id: string;
   name: string;
-  template_exercises: { name: string; weight: number; reps: number }[];
 };
 
 export default function Templates() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isStarting, setIsStarting] = useState(false);
   const router = useRouter();
 
+  // Fetch user session and templates on mount
   useEffect(() => {
     async function fetchUserAndTemplates() {
       const {
         data: { session },
-        error,
       } = await supabase.auth.getSession();
-      if (error || !session) {
+      if (!session) {
         router.push("/login");
         return;
       }
       setUserId(session.user.id);
-      const { data, error: fetchError } = await supabase
+      const { data, error } = await supabase
         .from("templates")
-        .select("id, name, template_exercises (name, weight, reps)")
+        .select("id, name")
         .eq("user_id", session.user.id);
-      if (fetchError) {
-        console.error(fetchError);
+      if (error) {
+        console.error("Error fetching templates:", error);
       } else {
         setTemplates(data || []);
       }
@@ -39,57 +40,77 @@ export default function Templates() {
     fetchUserAndTemplates();
   }, [router]);
 
+  // Function to start a workout from a template
   async function startFromTemplate(templateId: string) {
     if (!userId) return;
-    const { data: template, error } = await supabase
-      .from("templates")
-      .select("name, template_exercises (name, weight, reps)")
-      .eq("id", templateId)
-      .single();
-    if (error) {
-      alert(`Failed to load template: ${error.message}`);
-      return;
-    }
-    const { data: workout, error: workoutError } = await supabase
-      .from("workouts")
-      .insert({ name: template.name, user_id: userId })
-      .select()
-      .single();
-    if (workoutError) {
-      alert(`Failed to start workout: ${workoutError.message}`);
-      return;
-    }
-    const exercises = template.template_exercises.map((ex) => ({
-      workout_id: workout.id,
-      name: ex.name,
-      weight: ex.weight,
-      reps: ex.reps,
-    }));
-    const { error: exercisesError } = await supabase
-      .from("exercises")
-      .insert(exercises);
-    if (exercisesError) {
-      alert(`Failed to add exercises: ${exercisesError.message}`);
-    } else {
-      router.push("/workout"); // Redirect to workout page
+    setIsStarting(true);
+    try {
+      // Fetch template name
+      const { data: templateData, error: templateError } = await supabase
+        .from("templates")
+        .select("name")
+        .eq("id", templateId)
+        .single();
+      if (templateError) throw templateError;
+
+      // Fetch template exercises
+      const { data: templateExercises, error: exercisesError } = await supabase
+        .from("template_exercises")
+        .select("name, weight, reps")
+        .eq("template_id", templateId);
+      if (exercisesError) throw exercisesError;
+
+      // Create new workout with name based on template
+      const workoutName = `Workout from ${templateData.name}`;
+      const { data: workout, error: workoutError } = await supabase
+        .from("workouts")
+        .insert({ name: workoutName, user_id: userId })
+        .select()
+        .single();
+      if (workoutError) throw workoutError;
+
+      // Insert exercises into the new workout
+      const exercises = templateExercises.map((ex) => ({
+        workout_id: workout.id,
+        name: ex.name,
+        weight: ex.weight,
+        reps: ex.reps,
+      }));
+      const { error: insertError } = await supabase
+        .from("exercises")
+        .insert(exercises);
+      if (insertError) throw insertError;
+
+      // Redirect to workout page with new workout ID
+      router.push(`/workout?workoutId=${workout.id}`);
+    } catch (error) {
+      console.error("Error starting workout from template:", error);
+      alert("Failed to start workout. Please try again.");
+    } finally {
+      setIsStarting(false);
     }
   }
 
   return (
     <main className="p-4">
+      <Header />
       <h1 className="text-2xl font-bold">Workout Templates</h1>
       {templates.length === 0 ? (
-        <p className="mt-4">No templates yet. Create one from a workout!</p>
+        <p>No templates found.</p>
       ) : (
-        <ul className="mt-4 space-y-2">
+        <ul>
           {templates.map((template) => (
-            <li key={template.id} className="flex items-center justify-between">
+            <li
+              key={template.id}
+              className="flex justify-between items-center py-2"
+            >
               <span>{template.name}</span>
               <button
                 onClick={() => startFromTemplate(template.id)}
-                className="px-4 py-1 bg-blue-500 text-white rounded"
+                className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+                disabled={isStarting}
               >
-                Start
+                {isStarting ? "Starting..." : "Start"}
               </button>
             </li>
           ))}
