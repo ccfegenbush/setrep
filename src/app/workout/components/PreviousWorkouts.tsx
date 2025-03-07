@@ -3,18 +3,15 @@
 import Link from "next/link";
 import PlanItem from "@/components/PlanItem";
 import { useState } from "react";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa"; // Added icons for toggle
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
-type Plan = {
-  id: string;
-  name: string;
-};
+type Plan = { id: string; name: string };
 
 type PreviousWorkoutsProps = {
   plans: Plan[];
   isStartingWorkout: boolean;
   onStartWorkout: () => void;
-  onStartFromPlan: (planId: string) => void;
+  onStartFromPlan: (plan: Plan) => void; // Updated to accept Plan
   onOpenDeleteModal: (plan: Plan) => void;
 };
 
@@ -28,9 +25,9 @@ export default function PreviousWorkouts({
   const [showPreviousWorkouts, setShowPreviousWorkouts] = useState(true);
 
   return (
-    <div className="bg-whoop-card rounded-2xl p-6 shadow-lg shadow-glow border border-whoop-cyan/20">
+    <div className="bg-whoop-card rounded-xl p-6 sm:p-8 shadow-lg transition-all duration-300">
       <div
-        className="flex items-center justify-between mb-6 cursor-pointer hover:text-whoop-green transition-colors"
+        className="flex items-center justify-between mb-4 cursor-pointer hover:text-whoop-green transition-colors duration-200"
         onClick={() => setShowPreviousWorkouts(!showPreviousWorkouts)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -41,28 +38,28 @@ export default function PreviousWorkouts({
         role="button"
         tabIndex={0}
       >
-        <h2 className="text-2xl font-bold text-whoop-white tracking-tight">
+        <h2 className="text-xl font-semibold text-whoop-white">
           Previous Workouts
         </h2>
         {showPreviousWorkouts ? (
-          <FaChevronUp className="text-whoop-gray text-xl" />
+          <FaChevronUp className="text-whoop-gray text-lg" />
         ) : (
-          <FaChevronDown className="text-whoop-gray text-xl" />
+          <FaChevronDown className="text-whoop-gray text-lg" />
         )}
       </div>
       {showPreviousWorkouts && (
         <>
           {plans.length === 0 ? (
-            <p className="text-whoop-gray mb-6">
-              No previous workout plans saved.
+            <p className="text-whoop-gray/80 text-sm mb-4">
+              No previous plans saved.
             </p>
           ) : (
-            <ul className="max-h-96 overflow-y-scroll space-y-4 mb-6 scrollbar-thin scrollbar-thumb-whoop-cyan scrollbar-track-whoop-dark">
+            <ul className="max-h-80 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-whoop-cyan/50 scrollbar-track-whoop-dark/80">
               {plans.map((plan) => (
                 <PlanItem
                   key={plan.id}
                   plan={plan}
-                  onStart={onStartFromPlan}
+                  onStart={(plan: Plan) => onStartFromPlan(plan)} // Updated to pass Plan
                   onOpenDeleteModal={onOpenDeleteModal}
                   isStartingWorkout={isStartingWorkout}
                 />
@@ -73,14 +70,14 @@ export default function PreviousWorkouts({
       )}
       <button
         onClick={onStartWorkout}
-        className="w-full px-6 py-4 bg-gradient-to-r from-whoop-green to-whoop-cyan text-whoop-dark font-bold rounded-xl hover:scale-105 hover:shadow-glow transition-transform duration-200 disabled:bg-whoop-gray disabled:text-whoop-dark disabled:scale-100 disabled:shadow-none"
+        className="w-full px-5 py-3 bg-gradient-to-r from-whoop-green to-whoop-cyan text-whoop-dark font-semibold rounded-xl hover:bg-gradient-to-r hover:from-whoop-green/80 hover:to-whoop-cyan/80 transition-all duration-200 disabled:bg-whoop-gray/50 disabled:text-whoop-dark/70 disabled:cursor-not-allowed text-base"
         disabled={isStartingWorkout}
       >
         {isStartingWorkout ? "Starting..." : "Start New Workout"}
       </button>
       <div className="mt-4">
         <Link href="/progress">
-          <button className="w-full px-6 py-4 bg-gradient-to-r from-whoop-cyan to-whoop-dark text-whoop-white font-bold rounded-xl hover:scale-105 hover:shadow-glow transition-transform duration-200">
+          <button className="w-full px-5 py-3 bg-gradient-to-r from-whoop-cyan to-whoop-dark text-whoop-white font-semibold rounded-xl hover:bg-gradient-to-r hover:from-whoop-cyan/80 hover:to-whoop-dark/80 transition-all duration-200 text-base">
             View Progress
           </button>
         </Link>

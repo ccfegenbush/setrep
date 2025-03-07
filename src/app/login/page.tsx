@@ -25,11 +25,8 @@ export default function Login() {
       password: trimmedPassword,
     });
     setIsLoading(false);
-    if (error) {
-      setError(`Signup failed: ${error.message}`);
-    } else {
-      alert("Check your email for confirmation!");
-    }
+    if (error) setError(`Signup failed: ${error.message}`);
+    else alert("Check your email for confirmation!");
   }
 
   async function signIn() {
@@ -46,24 +43,21 @@ export default function Login() {
       password: trimmedPassword,
     });
     setIsLoading(false);
-    if (error) {
-      setError(`Signin failed: ${error.message}`);
-    } else {
-      router.push("/workout");
-    }
+    if (error) setError(`Signin failed: ${error.message}`);
+    else router.push("/workout");
   }
 
   return (
     <div className="min-h-screen bg-whoop-dark flex items-center justify-center">
-      <div className="bg-whoop-card rounded-2xl p-8 max-w-md w-full shadow-lg shadow-glow border border-whoop-cyan/30">
-        <h1 className="text-3xl font-bold text-whoop-green tracking-tight mb-8 text-center">
+      <div className="bg-whoop-card rounded-xl p-6 max-w-md w-full shadow-lg">
+        <h1 className="text-xl font-semibold text-whoop-green mb-4 text-center">
           SetRep
         </h1>
         <form onSubmit={(e) => e.preventDefault()}>
-          <div className="mb-6">
+          <div className="mb-3">
             <label
               htmlFor="email"
-              className="block text-whoop-gray font-semibold mb-2"
+              className="block text-whoop-gray text-sm font-medium mb-1"
             >
               Email
             </label>
@@ -72,15 +66,15 @@ export default function Login() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray disabled:bg-whoop-gray/50"
+              className="w-full p-2 bg-whoop-dark text-whoop-white rounded-lg focus:outline-none focus:ring-1 focus:ring-whoop-green placeholder-whoop-gray text-sm disabled:bg-whoop-gray/50"
               placeholder="Enter your email"
               required
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-3">
             <label
               htmlFor="password"
-              className="block text-whoop-gray font-semibold mb-2"
+              className="block text-whoop-gray text-sm font-medium mb-1"
             >
               Password
             </label>
@@ -89,23 +83,23 @@ export default function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray disabled:bg-whoop-gray/50"
+              className="w-full p-2 bg-whoop-dark text-whoop-white rounded-lg focus:outline-none focus:ring-1 focus:ring-whoop-green placeholder-whoop-gray text-sm disabled:bg-whoop-gray/50"
               placeholder="Enter your password"
               required
             />
           </div>
-          {error && <p className="text-red-400 text-sm mb-6">{error}</p>}
-          <div className="mt-8 flex space-x-4">
+          {error && <p className="text-red-400 text-xs mb-3">{error}</p>}
+          <div className="mt-4 flex space-x-3">
             <button
               onClick={signIn}
-              className="flex-1 px-6 py-4 bg-gradient-to-r from-whoop-cyan to-whoop-dark text-whoop-white font-semibold rounded-xl hover:scale-105 hover:shadow-glow transition-transform duration-200 disabled:bg-whoop-gray disabled:scale-100 disabled:shadow-none"
+              className="flex-1 px-4 py-2 bg-gradient-to-r from-whoop-cyan to-whoop-dark text-whoop-white font-medium rounded-lg hover:scale-102 transition-transform disabled:bg-whoop-gray disabled:scale-100 text-sm"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </button>
             <button
               onClick={signUp}
-              className="flex-1 px-6 py-4 bg-gradient-to-r from-whoop-green to-whoop-cyan text-whoop-dark font-semibold rounded-xl hover:scale-105 hover:shadow-glow transition-transform duration-200 disabled:bg-whoop-gray disabled:scale-100 disabled:shadow-none"
+              className="flex-1 px-4 py-2 bg-gradient-to-r from-whoop-green to-whoop-cyan text-whoop-dark font-medium rounded-lg hover:scale-102 transition-transform disabled:bg-whoop-gray disabled:scale-100 text-sm"
               disabled={isLoading}
             >
               {isLoading ? "Signing up..." : "Sign Up"}

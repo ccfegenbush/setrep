@@ -1,9 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { supabase } from "@/lib/supabase";
-import { Exercise } from "@/types";
 import { Dispatch, SetStateAction, useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+
+type Set = {
+  id?: string;
+  weight: number;
+  reps: number;
+  set_number: number;
+};
+
+type Exercise = {
+  id?: string;
+  name: string;
+  workout_id: string;
+  sets: Set[];
+};
 
 type Plan = {
   id: string;
@@ -54,7 +68,7 @@ export function useWorkout({
       data: { session },
       error,
     } = await supabase.auth.getSession();
-    if (error || !session) {
+    if (!session) {
       router.push("/login");
     } else {
       setUserId(session.user.id);
@@ -68,7 +82,8 @@ export function useWorkout({
           planError.message,
           planError.details
         );
-        alert("Failed to load plans. Please try again.");
+        setToastMessage("Failed to load plans. Please try again.");
+        setShowToast(true);
       } else {
         setPlans(planData || []);
       }
@@ -77,21 +92,49 @@ export function useWorkout({
 
   const fetchExercises = async () => {
     if (!workoutId) return;
-    const { data, error } = await supabase
+    const { data: exerciseData, error: exerciseError } = await supabase
       .from("exercises")
-      .select("*")
+      .select("id, name, workout_id")
       .eq("workout_id", workoutId);
-    if (error) {
-      console.error("Error fetching exercises:", error.message, error.details);
-      alert("Failed to load exercises. Please try again.");
-    } else {
-      setExercises(data || []);
+    if (exerciseError) {
+      console.error(
+        "Error fetching exercises:",
+        exerciseError.message,
+        exerciseError.details
+      );
+      setToastMessage("Failed to load exercises. Please try again.");
+      setShowToast(true);
+      return;
     }
+
+    // Fetch sets separately
+    const exerciseIds = exerciseData.map((ex) => ex.id);
+    const { data: setsData, error: setsError } = await supabase
+      .from("sets")
+      .select("*")
+      .in("exercise_id", exerciseIds);
+    if (setsError) {
+      console.error(
+        "Error fetching sets:",
+        setsError.message,
+        setsError.details
+      );
+      setToastMessage("Failed to load exercise sets. Please try again.");
+      setShowToast(true);
+      return;
+    }
+
+    const exercisesWithSets = exerciseData.map((exercise) => ({
+      ...exercise,
+      sets: setsData.filter((set) => set.exercise_id === exercise.id) || [],
+    }));
+    setExercises(exercisesWithSets || []);
   };
 
   const startWorkout = async () => {
     if (!userId) {
-      alert("Please log in first!");
+      setToastMessage("Please log in first!");
+      setShowToast(true);
       return;
     }
     setIsStartingWorkout(true);
@@ -106,31 +149,52 @@ export function useWorkout({
       setWorkoutStartTime(Date.now());
     } catch (error) {
       console.error("Error starting workout:", error);
-      alert("Failed to start workout. Please try again.");
+      setToastMessage("Failed to start workout. Please try again.");
+      setShowToast(true);
     } finally {
       setIsStartingWorkout(false);
     }
   };
 
-  const startFromPlan = async (planId: string) => {
+  const startFromPlan = async (plan: Plan) => {
     if (!userId) {
-      alert("Please log in first!");
+      setToastMessage("Please log in first!");
+      setShowToast(true);
       return;
     }
     setIsStartingWorkout(true);
     try {
+      console.log("Starting workout from plan with ID:", plan.id);
       const { data: planData, error: planError } = await supabase
         .from("plans")
         .select("name")
-        .eq("id", planId)
+        .eq("id", plan.id)
         .single();
-      if (planError) throw planError;
+      if (planError) {
+        console.error(
+          "Error fetching plan:",
+          planError.message,
+          planError.details
+        );
+        throw new Error(`Failed to fetch plan: ${planError.message}`);
+      }
+      console.log("Fetched plan data:", planData);
 
       const { data: planExercises, error: exercisesError } = await supabase
         .from("plan_exercises")
-        .select("name, weight, reps")
-        .eq("plan_id", planId);
-      if (exercisesError) throw exercisesError;
+        .select("name")
+        .eq("plan_id", plan.id);
+      if (exercisesError) {
+        console.error(
+          "Error fetching plan exercises:",
+          exercisesError.message,
+          exercisesError.details
+        );
+        throw new Error(
+          `Failed to fetch plan exercises: ${exercisesError.message}`
+        );
+      }
+      console.log("Fetched plan exercises:", planExercises);
 
       const workoutName = `${planData.name}`;
       const { data: workout, error: workoutError } = await supabase
@@ -138,24 +202,43 @@ export function useWorkout({
         .insert({ name: workoutName, user_id: userId })
         .select()
         .single();
-      if (workoutError) throw workoutError;
+      if (workoutError) {
+        console.error(
+          "Error creating workout:",
+          workoutError.message,
+          workoutError.details
+        );
+        throw new Error(`Failed to create workout: ${workoutError.message}`);
+      }
+      console.log("Created workout:", workout);
 
-      const exercisesToInsert = planExercises.map((ex) => ({
+      const exercisesToInsert = planExercises.map((ex: { name: string }) => ({
         workout_id: workout.id,
         name: ex.name,
-        weight: ex.weight,
-        reps: ex.reps,
+        sets: [],
       }));
-      const { error: insertError } = await supabase
+      const { data: insertedExercises, error: insertError } = await supabase
         .from("exercises")
-        .insert(exercisesToInsert);
-      if (insertError) throw insertError;
+        .insert(exercisesToInsert)
+        .select();
+      if (insertError) {
+        console.error(
+          "Error inserting exercises:",
+          insertError.message,
+          insertError.details
+        );
+        throw new Error(`Failed to insert exercises: ${insertError.message}`);
+      }
+      console.log("Inserted exercises:", insertedExercises);
 
+      setExercises(insertedExercises || []);
+      setPlanName(workoutName);
       setWorkoutId(workout.id);
       setWorkoutStartTime(Date.now());
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error starting workout from plan:", error);
-      alert("Failed to start workout from plan. Please try again.");
+      setToastMessage(error.message || "Failed to start workout from plan.");
+      setShowToast(true);
     } finally {
       setIsStartingWorkout(false);
     }
@@ -163,57 +246,106 @@ export function useWorkout({
 
   const saveWorkout = async () => {
     if (!workoutId) {
-      alert("No active workout to save.");
+      setToastMessage("No active workout to save.");
+      setShowToast(true);
       return;
     }
     setIsSaving(true);
     try {
       const { data: exercisesData, error: fetchError } = await supabase
         .from("exercises")
-        .select("name, weight, reps")
+        .select("id, name, workout_id")
         .eq("workout_id", workoutId);
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        console.error(
+          "Error fetching exercises for save:",
+          fetchError.message,
+          fetchError.details
+        );
+        throw fetchError;
+      }
+
+      const exerciseIds = exercisesData.map((ex) => ex.id);
+      const { data: setsData, error: setsError } = await supabase
+        .from("sets")
+        .select("*")
+        .in("exercise_id", exerciseIds);
+      if (setsError) {
+        console.error(
+          "Error fetching sets:",
+          setsError.message,
+          setsError.details
+        );
+        throw setsError;
+      }
+      const exercisesWithSets = exercisesData.map((exercise) => ({
+        ...exercise,
+        sets: setsData.filter((set) => set.exercise_id === exercise.id) || [],
+      }));
 
       const trimmedName = planName.trim();
-      const workoutName = trimmedName || new Date().toLocaleString();
-      const planNameFinal = trimmedName || new Date().toLocaleString();
+      const workoutName =
+        trimmedName || `Workout on ${new Date().toLocaleDateString()}`;
+      console.log(
+        "Saving workout with name:",
+        workoutName,
+        "and total_time:",
+        elapsedTime
+      );
 
-      const { error: updateWorkoutError } = await supabase
+      const { data: updatedWorkout, error: updateWorkoutError } = await supabase
         .from("workouts")
         .update({ name: workoutName, total_time: elapsedTime })
         .eq("id", workoutId)
-        .eq("user_id", userId);
-      if (updateWorkoutError) throw updateWorkoutError;
+        .eq("user_id", userId)
+        .select();
+      if (updateWorkoutError) {
+        console.error(
+          "Error updating workout:",
+          updateWorkoutError.message,
+          updateWorkoutError.details
+        );
+        throw updateWorkoutError;
+      }
+      console.log("Updated workout:", updatedWorkout);
 
       const { data: plan, error: planError } = await supabase
         .from("plans")
-        .insert({ name: planNameFinal, user_id: userId })
+        .insert({ name: workoutName, user_id: userId })
         .select()
         .single();
       if (planError) throw planError;
 
-      const planExercises = exercisesData.map((exercise) => ({
-        plan_id: plan.id,
-        name: exercise.name,
-        weight: exercise.weight,
-        reps: exercise.reps,
-      }));
+      const planExercises = exercisesWithSets.flatMap((exercise: Exercise) =>
+        exercise.sets.map((set: Set) => ({
+          plan_id: plan.id,
+          name: exercise.name,
+          weight: set.weight,
+          reps: set.reps,
+        }))
+      );
       const { error: exercisesError } = await supabase
         .from("plan_exercises")
         .insert(planExercises);
       if (exercisesError) throw exercisesError;
 
-      setPlans([...plans, { id: plan.id, name: planNameFinal }]);
+      setPlans([...plans, { id: plan.id, name: workoutName }]);
       setWorkoutId(null);
       setPlanName("");
       setShowModal(false);
       setWorkoutStartTime(null);
+      const finalElapsedTime = elapsedTime;
       setElapsedTime(0);
-      setToastMessage("Workout saved successfully!");
+      setToastMessage(
+        `Workout "${workoutName}" saved successfully! (Total time: ${formatTime(
+          finalElapsedTime
+        )})`
+      );
       setShowToast(true);
     } catch (error) {
       console.error("Error saving workout:", error);
-      alert("Failed to save workout. Please try again.");
+      setToastMessage("Failed to save workout. Please try again.");
+      setShowToast(true);
     } finally {
       setIsSaving(false);
     }
@@ -221,7 +353,8 @@ export function useWorkout({
 
   const deletePlan = async (planId: string) => {
     if (!userId) {
-      alert("User not authenticated.");
+      setToastMessage("User not authenticated.");
+      setShowToast(true);
       return;
     }
     try {
@@ -243,9 +376,10 @@ export function useWorkout({
       setShowToast(true);
     } catch (error) {
       console.error("Error deleting plan:", error);
-      alert(
+      setToastMessage(
         "Failed to delete plan. Please check your permissions or try again."
       );
+      setShowToast(true);
     }
   };
 
@@ -255,6 +389,16 @@ export function useWorkout({
     } else {
       if (workoutId && userId) {
         try {
+          const { data: exercisesData } = await supabase
+            .from("exercises")
+            .select("id")
+            .eq("workout_id", workoutId);
+
+          if (exercisesData && exercisesData.length > 0) {
+            const exerciseIds = exercisesData.map((ex: { id: any }) => ex.id);
+            await supabase.from("sets").delete().in("exercise_id", exerciseIds);
+          }
+
           const { error: exercisesError } = await supabase
             .from("exercises")
             .delete()
@@ -269,9 +413,10 @@ export function useWorkout({
           if (workoutError) throw workoutError;
         } catch (error) {
           console.error("Error deleting unsaved workout:", error);
-          alert(
+          setToastMessage(
             "Failed to clean up unsaved workout. It may remain in the database."
           );
+          setShowToast(true);
         }
       }
       setWorkoutId(null);
@@ -283,7 +428,6 @@ export function useWorkout({
     }
   };
 
-  // Memoize the returned functions to prevent re-creation on every render
   return useMemo(
     () => ({
       fetchUserAndPlans,
@@ -315,7 +459,12 @@ export function useWorkout({
   );
 }
 
-// Note: These states should be managed elsewhere or passed as props
+function formatTime(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+}
+
 let workoutStartTime: number | null = null;
 let elapsedTime: number = 0;
 
