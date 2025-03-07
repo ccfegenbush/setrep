@@ -7,15 +7,15 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Exercise } from "@/types";
 import Header from "@/components/Header";
-import PlanItem from "@/components/PlanItem";
 import ActiveWorkout from "./components/ActiveWorkout";
 import PreviousWorkouts from "./components/PreviousWorkouts";
 import EndWorkoutModal from "./components/EndWorkoutModal";
 import DeletePlanModal from "./components/DeletePlanModal";
 import Toast from "./components/Toast";
+import WeightTracking from "@/components/WeightTracking";
 import { useWorkout } from "./hooks/useWorkout";
+import { FaDumbbell } from "react-icons/fa";
 
-// Define the Plan type
 type Plan = {
   id: string;
   name: string;
@@ -56,12 +56,10 @@ export default function Workout() {
     plans,
   });
 
-  // Fetch user session and plans on mount
   useEffect(() => {
     workoutHandlers.fetchUserAndPlans();
-  }, []); // Empty dependency array since we only want this to run once on mount
+  }, []);
 
-  // Set workoutId from query parameter if provided
   useEffect(() => {
     const initialWorkoutId = searchParams.get("workoutId");
     if (initialWorkoutId && !workoutId) {
@@ -69,12 +67,10 @@ export default function Workout() {
     }
   }, [searchParams, workoutId]);
 
-  // Fetch exercises when workoutId changes
   useEffect(() => {
     workoutHandlers.fetchExercises();
-  }, [workoutId]); // Only re-run when workoutId changes
+  }, [workoutId]);
 
-  // Handle navigation away (cleanup if unsaved)
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       if (workoutId) {
@@ -83,39 +79,49 @@ export default function Workout() {
           "You have an unsaved workout. Are you sure you want to leave?";
       }
     };
-
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [workoutId]);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-whoop-dark text-whoop-white">
       <Header />
       <main
-        className={`max-w-4xl mx-auto p-6 ${
+        className={`max-w-6xl mx-auto p-6 md:p-10 ${
           showModal || showDeleteModal ? "blur-sm" : ""
         }`}
       >
+        <div className="flex items-center mb-8">
+          <FaDumbbell className="text-whoop-green text-4xl mr-3" />
+          <h1 className="text-4xl font-bold tracking-tight">Workouts</h1>
+        </div>
         {workoutId ? (
-          <ActiveWorkout
-            workoutId={workoutId}
-            exercises={exercises}
-            setExercises={setExercises}
-            planName={planName}
-            setPlanName={setPlanName}
-            onEndWorkout={() => setShowModal(true)}
-          />
+          <div className="bg-whoop-card rounded-2xl p-6 shadow-lg shadow-glow border border-whoop-cyan/20">
+            <ActiveWorkout
+              workoutId={workoutId}
+              exercises={exercises}
+              setExercises={setExercises}
+              planName={planName}
+              setPlanName={setPlanName}
+              onEndWorkout={() => setShowModal(true)}
+            />
+          </div>
         ) : (
-          <PreviousWorkouts
-            plans={plans}
-            isStartingWorkout={isStartingWorkout}
-            onStartWorkout={workoutHandlers.startWorkout}
-            onStartFromPlan={workoutHandlers.startFromPlan}
-            onOpenDeleteModal={(plan) => {
-              setPlanToDelete(plan);
-              setShowDeleteModal(true);
-            }}
-          />
+          <div className="space-y-10">
+            <div className="bg-whoop-card rounded-2xl p-6 shadow-lg shadow-glow border border-whoop-cyan/20">
+              <PreviousWorkouts
+                plans={plans}
+                isStartingWorkout={isStartingWorkout}
+                onStartWorkout={workoutHandlers.startWorkout}
+                onStartFromPlan={workoutHandlers.startFromPlan}
+                onOpenDeleteModal={(plan) => {
+                  setPlanToDelete(plan);
+                  setShowDeleteModal(true);
+                }}
+              />
+            </div>
+            <WeightTracking />
+          </div>
         )}
       </main>
       <EndWorkoutModal
