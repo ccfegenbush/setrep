@@ -18,7 +18,7 @@ type Props = {
   setExercises: (exercises: Exercise[]) => void;
 };
 
-export default function ExerciseLog({
+export default function Exercises({
   workoutId,
   exercises,
   setExercises,
@@ -59,8 +59,8 @@ export default function ExerciseLog({
   }
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">Exercise Log</h2>
+    <div className="bg-white shadow-md rounded-lg p-4">
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">Exercises</h2>
       <ul className="space-y-2 mb-6">
         {exercises.length === 0 ? (
           <li className="text-gray-600">No exercises added yet.</li>

@@ -8,54 +8,42 @@ export default function RestTimer() {
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (isRunning && time > 0) {
+    if (isRunning) {
       timer = setInterval(() => {
-        setTime((prev) => prev - 1);
+        setTime((prev) => prev + 1); // Increment time every second
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [isRunning, time]);
+  }, [isRunning]);
 
-  const startTimer = (seconds: number) => {
-    setTime(seconds);
-    setIsRunning(true);
-  };
-
-  const stopTimer = () => {
-    setIsRunning(false);
-  };
-
-  const resetTimer = () => {
-    setIsRunning(false);
-    setTime(0);
+  const toggleTimer = () => {
+    if (isRunning) {
+      setIsRunning(false); // Stop the timer
+      setTime(0); // Reset to zero
+    } else {
+      setIsRunning(true); // Start counting up from current time (0 if reset)
+    }
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 mt-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">Rest Timer</h2>
-      <div className="text-2xl font-mono text-gray-700 mb-4">{time}s</div>
-      <div className="flex space-x-4">
-        <button
-          onClick={() => startTimer(60)}
-          className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 transition-colors font-semibold"
-          disabled={isRunning}
-        >
-          Start (60s)
-        </button>
-        <button
-          onClick={stopTimer}
-          className="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 transition-colors font-semibold"
-          disabled={!isRunning}
-        >
-          Stop
-        </button>
-        <button
-          onClick={resetTimer}
-          className="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:bg-gray-400 transition-colors font-semibold"
-          disabled={time === 0}
-        >
-          Reset
-        </button>
+    <div className="bg-white shadow-md rounded-lg p-4 mt-4">
+      <h2 className="text-lg font-semibold text-gray-800 mb-4">Rest</h2>
+      <div className="flex justify-center space-x-8">
+        <div className="flex-1 flex justify-center">
+          <div className="text-5xl font-mono text-gray-700">{time}s</div>
+        </div>
+        <div className="flex-1 flex justify-center">
+          <button
+            onClick={toggleTimer}
+            className={`px-6 py-3 text-white rounded-md hover:${
+              isRunning ? "bg-red-700" : "bg-green-700"
+            } transition-colors font-semibold text-lg ${
+              isRunning ? "bg-red-600" : "bg-green-600"
+            }`}
+          >
+            {isRunning ? "End" : "Start"}
+          </button>
+        </div>
       </div>
     </div>
   );

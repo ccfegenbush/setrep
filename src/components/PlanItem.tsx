@@ -2,20 +2,20 @@ import { useState } from "react";
 import { useSwipeable } from "react-swipeable";
 import { TrashIcon } from "@heroicons/react/24/solid";
 
-type Template = {
+type Plan = {
   id: string;
   name: string;
 };
 
-type TemplateItemProps = {
-  template: Template;
+type PlanItemProps = {
+  plan: Plan;
   onStart: (id: string) => void;
-  onOpenDeleteModal: (template: Template) => void;
+  onOpenDeleteModal: (plan: Plan) => void;
   isStartingWorkout: boolean;
 };
 
-const TemplateItem: React.FC<TemplateItemProps> = ({
-  template,
+const PlanItem: React.FC<PlanItemProps> = ({
+  plan,
   onStart,
   onOpenDeleteModal,
   isStartingWorkout,
@@ -33,7 +33,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({
     },
     onSwipedLeft: () => {
       if (swipeProgress >= 100) {
-        onOpenDeleteModal(template);
+        onOpenDeleteModal(plan);
       }
       setSwipeProgress(0);
     },
@@ -55,9 +55,9 @@ const TemplateItem: React.FC<TemplateItemProps> = ({
         className="flex justify-between items-center bg-gray-50 p-3 transition-transform duration-100"
         style={{ transform }}
       >
-        <span className="text-gray-700 font-medium">{template.name}</span>
+        <span className="text-gray-700 font-medium">{plan.name}</span>
         <button
-          onClick={() => onStart(template.id)}
+          onClick={() => onStart(plan.id)}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
           disabled={isStartingWorkout}
         >
@@ -68,4 +68,4 @@ const TemplateItem: React.FC<TemplateItemProps> = ({
   );
 };
 
-export default TemplateItem;
+export default PlanItem;
