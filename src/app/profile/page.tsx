@@ -77,33 +77,40 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function fetchProfile() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) {
-        router.push("/login");
-        return;
-      }
-      const userId = session.user.id;
-      setUserId(userId);
+      try {
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!session) {
+          router.push("/login");
+          return;
+        }
+        const userId = session.user.id;
+        setUserId(userId);
 
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", userId)
+          .single();
 
-      if (profileError && profileError.code !== "PGRST116") {
-        console.error(
-          "Error fetching profile:",
-          profileError.message,
-          profileError.details
-        );
-      } else if (profileData) {
-        setProfile(profileData);
-        setStartingWeight(profileData.weight_lb?.toString() || "");
+        if (profileError && profileError.code !== "PGRST116") {
+          console.error(
+            "Error fetching profile:",
+            profileError.message,
+            profileError.details
+          );
+        } else if (profileData) {
+          setProfile(profileData);
+          setStartingWeight(profileData.weight_lb?.toString() || "");
+        }
+      } catch (error) {
+        console.error("Error in fetchProfile:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }
     fetchProfile();
   }, [router]);

@@ -3,10 +3,11 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Exercise } from "@/types";
 import Header from "@/components/Header";
+import PlanItem from "@/components/PlanItem";
 import ActiveWorkout from "./components/ActiveWorkout";
 import PreviousWorkouts from "./components/PreviousWorkouts";
 import EndWorkoutModal from "./components/EndWorkoutModal";
@@ -16,10 +17,29 @@ import WeightTracking from "@/components/WeightTracking";
 import { useWorkout } from "./hooks/useWorkout";
 import { FaDumbbell } from "react-icons/fa";
 
+// Define the Plan type
 type Plan = {
   id: string;
   name: string;
 };
+
+// Child component to isolate useSearchParams
+function WorkoutParams({
+  setWorkoutId,
+}: {
+  setWorkoutId: (id: string | null) => void;
+}) {
+  const searchParams = useSearchParams();
+  const initialWorkoutId = searchParams.get("workoutId");
+
+  useEffect(() => {
+    if (initialWorkoutId) {
+      setWorkoutId(initialWorkoutId);
+    }
+  }, [initialWorkoutId, setWorkoutId]);
+
+  return null; // This component only handles logic, no UI
+}
 
 export default function Workout() {
   const [workoutId, setWorkoutId] = useState<string | null>(null);
@@ -35,7 +55,6 @@ export default function Workout() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const workoutHandlers = useWorkout({
     setUserId,
@@ -61,13 +80,6 @@ export default function Workout() {
   }, []);
 
   useEffect(() => {
-    const initialWorkoutId = searchParams.get("workoutId");
-    if (initialWorkoutId && !workoutId) {
-      setWorkoutId(initialWorkoutId);
-    }
-  }, [searchParams, workoutId]);
-
-  useEffect(() => {
     workoutHandlers.fetchExercises();
   }, [workoutId]);
 
@@ -79,6 +91,7 @@ export default function Workout() {
           "You have an unsaved workout. Are you sure you want to leave?";
       }
     };
+
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [workoutId]);
@@ -95,6 +108,13 @@ export default function Workout() {
           <FaDumbbell className="text-whoop-green text-4xl mr-3" />
           <h1 className="text-4xl font-bold tracking-tight">Workouts</h1>
         </div>
+        <Suspense
+          fallback={
+            <div className="text-whoop-gray">Loading workout parameters...</div>
+          }
+        >
+          <WorkoutParams setWorkoutId={setWorkoutId} />
+        </Suspense>
         {workoutId ? (
           <div className="bg-whoop-card rounded-2xl p-6 shadow-lg shadow-glow border border-whoop-cyan/20">
             <ActiveWorkout

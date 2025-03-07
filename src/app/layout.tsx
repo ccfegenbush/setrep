@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Montserrat } from "next/font/google"; // Add Montserrat
+import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,12 +15,12 @@ const geistMono = Geist_Mono({
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
-  weight: ["400", "600", "700"], // Regular, Semi-bold, Bold
+  weight: ["400", "600", "700"],
 });
 
 export const metadata: Metadata = {
   title: "SetRep",
-  description: "Force, Intensity, Gains",
+  description: "A fitness tracking app",
 };
 
 export default function RootLayout({

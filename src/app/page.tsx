@@ -1,8 +1,20 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push("/workout"); // Redirect to workout page
+  }, [router]);
+
   return (
-    <main>
-      <h1>SetRep</h1>
-      <p>Welcome to your workout tracking app!</p>
-    </main>
+    <div className="min-h-screen bg-whoop-dark text-whoop-white flex items-center justify-center">
+      <h1 className="text-4xl font-bold text-whoop-green">
+        Redirecting to Workouts...
+      </h1>
+    </div>
   );
 }
