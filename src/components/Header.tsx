@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaUserCircle } from "react-icons/fa"; // Updated icon
+import { FaUserCircle } from "react-icons/fa";
 
 export default function Header() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -25,56 +25,49 @@ export default function Header() {
     }
   }
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen((prev) => !prev);
-  };
-
+  const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
   const handleClickOutside = (event: MouseEvent) => {
     const target = event.target as HTMLElement;
-    if (!target.closest(".profile-menu")) {
-      setIsDropdownOpen(false);
-    }
+    if (!target.closest(".profile-menu")) setIsDropdownOpen(false);
   };
 
   useEffect(() => {
     if (isDropdownOpen) {
       document.addEventListener("click", handleClickOutside);
-      return () => {
-        document.removeEventListener("click", handleClickOutside);
-      };
+      return () => document.removeEventListener("click", handleClickOutside);
     }
   }, [isDropdownOpen]);
 
   return (
-    <header className="bg-whoop-dark shadow-lg p-4 border-b border-whoop-cyan/20">
-      <div className="max-w-6xl mx-auto flex justify-between items-center">
+    <header className="bg-whoop-dark shadow-xl p-4 border-b border-whoop-cyan/20 relative z-10">
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link href="/workout">
-          <h1 className="text-3xl font-bold text-whoop-green tracking-tight cursor-pointer hover:text-whoop-cyan transition-colors">
+          <h1 className="text-xl sm:text-2xl font-bold text-whoop-green hover:text-whoop-cyan transition-colors duration-200">
             SetRep
           </h1>
         </Link>
         <div className="relative profile-menu">
           <button
             onClick={toggleDropdown}
-            className="flex items-center focus:outline-none"
+            className="flex items-center focus:outline-none p-1 rounded-full hover:bg-whoop-dark/50 transition-colors duration-200"
             aria-label="User Profile"
           >
-            <FaUserCircle className="w-8 h-8 text-whoop-white hover:text-whoop-green transition-colors" />
+            <FaUserCircle className="w-7 h-7 text-whoop-white hover:text-whoop-green transition-colors duration-200" />
           </button>
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-whoop-card rounded-xl shadow-lg shadow-glow z-10 border border-whoop-cyan/30">
+            <div className="absolute right-0 mt-2 w-48 bg-black rounded-lg shadow-xl border border-whoop-cyan/30 z-50 opacity-100 transition-all duration-200">
               <ul className="py-2">
                 <li>
                   <Link href="/profile">
-                    <span className="block px-4 py-2 text-whoop-white hover:bg-whoop-dark hover:text-whoop-green cursor-pointer transition-colors">
-                      View Profile
+                    <span className="block px-4 py-2 text-whoop-white hover:bg-whoop-dark/50 hover:text-whoop-green transition-colors duration-200 text-sm font-medium">
+                      Profile
                     </span>
                   </Link>
                 </li>
                 <li>
                   <button
                     onClick={logout}
-                    className="w-full text-left px-4 py-2 text-whoop-white hover:bg-whoop-dark hover:text-whoop-green disabled:text-whoop-gray disabled:hover:bg-whoop-card transition-colors"
+                    className="w-full text-left px-4 py-2 text-whoop-white hover:bg-whoop-dark/50 hover:text-whoop-green disabled:text-whoop-gray/70 disabled:hover:bg-whoop-card transition-colors duration-200 text-sm font-medium"
                     disabled={isLoggingOut}
                   >
                     {isLoggingOut ? "Logging out..." : "Logout"}

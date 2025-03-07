@@ -5,25 +5,37 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Exercise } from "@/types";
 import Header from "@/components/Header";
 import PlanItem from "@/components/PlanItem";
 import ActiveWorkout from "./components/ActiveWorkout";
 import PreviousWorkouts from "./components/PreviousWorkouts";
 import EndWorkoutModal from "./components/EndWorkoutModal";
-import DeletePlanModal from "./components/DeletePlanModal";
+import DeleteModal from "./components/DeleteModal";
 import Toast from "./components/Toast";
 import WeightTracking from "@/components/WeightTracking";
 import { useWorkout } from "./hooks/useWorkout";
 import { FaDumbbell } from "react-icons/fa";
+import { supabase } from "@/lib/supabase";
 
-// Define the Plan type
+type Set = {
+  id?: string;
+  weight: number;
+  reps: number;
+  set_number: number;
+};
+
+type Exercise = {
+  id?: string;
+  name: string;
+  workout_id: string;
+  sets: Set[];
+};
+
 type Plan = {
   id: string;
   name: string;
 };
 
-// Child component to isolate useSearchParams
 function WorkoutParams({
   setWorkoutId,
 }: {
@@ -38,7 +50,7 @@ function WorkoutParams({
     }
   }, [initialWorkoutId, setWorkoutId]);
 
-  return null; // This component only handles logic, no UI
+  return null;
 }
 
 export default function Workout() {
@@ -97,26 +109,32 @@ export default function Workout() {
   }, [workoutId]);
 
   return (
-    <div className="min-h-screen bg-whoop-dark text-whoop-white">
+    <div className="min-h-screen bg-whoop-dark text-whoop-white font-sans">
       <Header />
       <main
-        className={`max-w-6xl mx-auto p-6 md:p-10 ${
+        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300 ${
           showModal || showDeleteModal ? "blur-sm" : ""
         }`}
       >
-        <div className="flex items-center mb-8">
-          <FaDumbbell className="text-whoop-green text-4xl mr-3" />
-          <h1 className="text-4xl font-bold tracking-tight">Workouts</h1>
+        <div className="flex items-center mb-10">
+          <FaDumbbell className="text-whoop-green text-3xl sm:text-4xl mr-4 transition-transform hover:scale-105" />
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-whoop-white to-whoop-cyan bg-clip-text text-transparent">
+            Workouts
+          </h1>
         </div>
+
         <Suspense
           fallback={
-            <div className="text-whoop-gray">Loading workout parameters...</div>
+            <div className="text-whoop-gray/70 text-lg animate-pulse">
+              Loading workout parameters...
+            </div>
           }
         >
           <WorkoutParams setWorkoutId={setWorkoutId} />
         </Suspense>
+
         {workoutId ? (
-          <div className="bg-whoop-card rounded-2xl p-6 shadow-lg shadow-glow border border-whoop-cyan/20">
+          <div className="bg-whoop-card rounded-xl p-6 sm:p-8 shadow-lg transition-all duration-300">
             <ActiveWorkout
               workoutId={workoutId}
               exercises={exercises}
@@ -124,34 +142,43 @@ export default function Workout() {
               planName={planName}
               setPlanName={setPlanName}
               onEndWorkout={() => setShowModal(true)}
+              setToastMessage={setToastMessage}
+              setShowToast={setShowToast}
             />
           </div>
         ) : (
-          <div className="space-y-10">
-            <div className="bg-whoop-card rounded-2xl p-6 shadow-lg shadow-glow border border-whoop-cyan/20">
+          <div className="space-y-12">
+            <div className="bg-whoop-card rounded-xl p-6 sm:p-8 shadow-lg transition-all duration-300">
               <PreviousWorkouts
                 plans={plans}
                 isStartingWorkout={isStartingWorkout}
                 onStartWorkout={workoutHandlers.startWorkout}
-                onStartFromPlan={workoutHandlers.startFromPlan}
+                onStartFromPlan={(plan: Plan) => {
+                  setPlanName(plan.name);
+                  workoutHandlers.startFromPlan(plan);
+                }}
                 onOpenDeleteModal={(plan) => {
                   setPlanToDelete(plan);
                   setShowDeleteModal(true);
                 }}
               />
             </div>
-            <WeightTracking />
+            <div className="bg-whoop-card rounded-xl p-6 sm:p-8 shadow-lg transition-all duration-300">
+              <WeightTracking />
+            </div>
           </div>
         )}
       </main>
+
       <EndWorkoutModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onConfirm={workoutHandlers.confirmEndWorkout}
       />
-      <DeletePlanModal
+      <DeleteModal
         isOpen={showDeleteModal}
-        planToDelete={planToDelete}
+        itemType="plan"
+        itemName={planToDelete?.name || ""}
         onClose={() => {
           setShowDeleteModal(false);
           setPlanToDelete(null);

@@ -159,13 +159,11 @@ export default function ProfilePage() {
           ).padStart(2, "0")}`
         : null;
     const updatedProfile = { ...profile, height_cm, weight_lb, date_of_birth };
-    const { error } = await supabase
-      .from("profiles")
-      .upsert({
-        id: userId,
-        ...updatedProfile,
-        updated_at: new Date().toISOString(),
-      });
+    const { error } = await supabase.from("profiles").upsert({
+      id: userId,
+      ...updatedProfile,
+      updated_at: new Date().toISOString(),
+    });
     if (error) {
       console.error("Error saving profile:", error.message, error.details);
       alert(`Failed to save profile: ${error.message}`);
@@ -230,25 +228,27 @@ export default function ProfilePage() {
   const tdee = calculateTDEE();
 
   return (
-    <div className="min-h-screen bg-whoop-dark text-whoop-white">
+    <div className="min-h-screen bg-whoop-dark text-whoop-white font-sans">
       <Header />
-      <main className="max-w-6xl mx-auto p-6 md:p-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {isLoading ? (
-          <div className="bg-whoop-card rounded-2xl p-6 shadow-lg shadow-glow border border-whoop-cyan/20 text-center min-h-[100px] flex items-center justify-center">
-            <div className="text-whoop-gray">Loading...</div>
+          <div className="bg-whoop-card rounded-xl p-6 sm:p-8 shadow-xl shadow-whoop-cyan/10 border border-whoop-cyan/30 text-center min-h-[200px] flex items-center justify-center transition-all duration-300">
+            <div className="text-whoop-gray/70 text-lg animate-pulse">
+              Loading Profile...
+            </div>
           </div>
         ) : (
-          <div className="bg-whoop-card rounded-2xl p-6 shadow-lg shadow-glow border border-whoop-cyan/20">
-            <div className="flex items-center mb-8">
-              <FaUser className="text-whoop-green text-3xl mr-3" />
-              <h2 className="text-4xl font-bold tracking-tight">
+          <div className="bg-whoop-card rounded-xl p-6 sm:p-8 shadow-xl shadow-whoop-cyan/10 border border-whoop-cyan/30 hover:shadow-whoop-cyan/20 transition-all duration-300">
+            <div className="flex items-center mb-10 border-b border-whoop-cyan/20 pb-4">
+              <FaUser className="text-whoop-green text-3xl sm:text-4xl mr-4 transition-transform hover:scale-110" />
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-whoop-white to-whoop-cyan bg-clip-text text-transparent">
                 Your Profile
               </h2>
             </div>
 
             {/* Contact Info */}
-            <section className="mb-8">
-              <h3 className="text-2xl font-semibold text-whoop-white mb-4">
+            <section className="mb-10">
+              <h3 className="text-2xl font-bold text-whoop-white mb-6">
                 Contact Information
               </h3>
               <div className="space-y-4">
@@ -259,7 +259,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setProfile({ ...profile, full_name: e.target.value })
                   }
-                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray"
+                  className="w-full p-4 bg-whoop-dark/50 text-whoop-white border border-whoop-cyan/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-whoop-green focus:border-transparent placeholder-whoop-gray/70 transition-all duration-200"
                 />
                 <input
                   type="email"
@@ -268,7 +268,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setProfile({ ...profile, email: e.target.value })
                   }
-                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray"
+                  className="w-full p-4 bg-whoop-dark/50 text-whoop-white border border-whoop-cyan/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-whoop-green focus:border-transparent placeholder-whoop-gray/70 transition-all duration-200"
                 />
                 <input
                   type="tel"
@@ -277,14 +277,14 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setProfile({ ...profile, phone_number: e.target.value })
                   }
-                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray"
+                  className="w-full p-4 bg-whoop-dark/50 text-whoop-white border border-whoop-cyan/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-whoop-green focus:border-transparent placeholder-whoop-gray/70 transition-all duration-200"
                 />
               </div>
             </section>
 
             {/* Personal Details */}
-            <section className="mb-8">
-              <h3 className="text-2xl font-semibold text-whoop-white mb-4">
+            <section className="mb-10">
+              <h3 className="text-2xl font-bold text-whoop-white mb-6">
                 Personal Details
               </h3>
               <div className="space-y-6">
@@ -296,7 +296,7 @@ export default function ProfilePage() {
                       gender: e.target.value as "male" | "female",
                     })
                   }
-                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
+                  className="w-full p-4 bg-whoop-dark/50 text-whoop-white border border-whoop-cyan/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-whoop-green focus:border-transparent transition-all duration-200"
                 >
                   <option value="" className="text-whoop-gray">
                     Select Gender
@@ -305,14 +305,14 @@ export default function ProfilePage() {
                   <option value="female">Female</option>
                 </select>
                 <div>
-                  <p className="text-sm font-semibold text-whoop-gray mb-2">
+                  <p className="text-sm font-medium text-whoop-gray/80 mb-2">
                     Date of Birth
                   </p>
-                  <div className="flex space-x-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <select
                       value={dobMonth}
                       onChange={(e) => setDobMonth(e.target.value)}
-                      className="w-1/3 p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
+                      className="w-full p-4 bg-whoop-dark/50 text-whoop-white border border-whoop-cyan/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-whoop-green focus:border-transparent transition-all duration-200"
                     >
                       <option value="" className="text-whoop-gray">
                         Month
@@ -330,7 +330,7 @@ export default function ProfilePage() {
                     <select
                       value={dobDay}
                       onChange={(e) => setDobDay(e.target.value)}
-                      className="w-1/3 p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
+                      className="w-full p-4 bg-whoop-dark/50 text-whoop-white border border-whoop-cyan/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-whoop-green focus:border-transparent transition-all duration-200"
                     >
                       <option value="" className="text-whoop-gray">
                         Day
@@ -346,7 +346,7 @@ export default function ProfilePage() {
                     <select
                       value={dobYear}
                       onChange={(e) => setDobYear(e.target.value)}
-                      className="w-1/3 p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
+                      className="w-full p-4 bg-whoop-dark/50 text-whoop-white border border-whoop-cyan/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-whoop-green focus:border-transparent transition-all duration-200"
                     >
                       <option value="" className="text-whoop-gray">
                         Year
@@ -363,14 +363,14 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-whoop-gray mb-2">
+                  <p className="text-sm font-medium text-whoop-gray/80 mb-2">
                     Height
                   </p>
-                  <div className="flex space-x-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <select
                       value={heightFeet}
                       onChange={(e) => setHeightFeet(e.target.value)}
-                      className="w-1/2 p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
+                      className="w-full p-4 bg-whoop-dark/50 text-whoop-white border border-whoop-cyan/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-whoop-green focus:border-transparent transition-all duration-200"
                     >
                       <option value="" className="text-whoop-gray">
                         Feet
@@ -384,7 +384,7 @@ export default function ProfilePage() {
                     <select
                       value={heightInches}
                       onChange={(e) => setHeightInches(e.target.value)}
-                      className="w-1/2 p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
+                      className="w-full p-4 bg-whoop-dark/50 text-whoop-white border border-whoop-cyan/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-whoop-green focus:border-transparent transition-all duration-200"
                     >
                       <option value="" className="text-whoop-gray">
                         Inches
@@ -402,14 +402,14 @@ export default function ProfilePage() {
                   placeholder="Weight (lb)"
                   value={startingWeight}
                   onChange={(e) => setStartingWeight(e.target.value)}
-                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray"
+                  className="w-full p-4 bg-whoop-dark/50 text-whoop-white border border-whoop-cyan/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-whoop-green focus:border-transparent placeholder-whoop-gray/70 transition-all duration-200"
                 />
               </div>
             </section>
 
             {/* Fitness Goal */}
-            <section className="mb-8">
-              <h3 className="text-2xl font-semibold text-whoop-white mb-4">
+            <section className="mb-10">
+              <h3 className="text-2xl font-bold text-whoop-white mb-6">
                 Fitness Goal
               </h3>
               <div className="space-y-6">
@@ -421,7 +421,7 @@ export default function ProfilePage() {
                       fitness_goal: e.target.value as any,
                     })
                   }
-                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
+                  className="w-full p-4 bg-whoop-dark/50 text-whoop-white border border-whoop-cyan/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-whoop-green focus:border-transparent transition-all duration-200"
                 >
                   <option value="" className="text-whoop-gray">
                     Select Goal
@@ -438,7 +438,7 @@ export default function ProfilePage() {
                       activity_level: e.target.value as any,
                     })
                   }
-                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
+                  className="w-full p-4 bg-whoop-dark/50 text-whoop-white border border-whoop-cyan/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-whoop-green focus:border-transparent transition-all duration-200"
                 >
                   <option value="" className="text-whoop-gray">
                     Select Activity Level
@@ -460,18 +460,21 @@ export default function ProfilePage() {
                   </option>
                 </select>
                 {tdee && (
-                  <div className="bg-gradient-to-r from-whoop-dark to-whoop-card p-6 rounded-xl border border-whoop-green/30 text-center">
-                    <h4 className="text-lg font-semibold text-whoop-gray mb-2">
+                  <div className="bg-whoop-dark/50 p-6 rounded-lg border border-whoop-green/40 text-center transition-all duration-300 hover:border-whoop-green/60">
+                    <h4 className="text-lg font-medium text-whoop-gray/80 mb-3">
                       Target Daily Calorie Intake
                     </h4>
-                    <div className="flex justify-center">
-                      <span className="text-5xl font-bold text-whoop-green">
+                    <div className="flex justify-center items-center">
+                      <span className="text-4xl sm:text-5xl font-extrabold text-whoop-green">
                         {tdee}
                       </span>
+                      <span className="text-xl text-whoop-gray/80 ml-2">
+                        cal
+                      </span>
                     </div>
-                    <p className="text-whoop-gray mt-2">
-                      calories to achieve your{" "}
-                      {profile.fitness_goal?.replace("_", " ")} goal
+                    <p className="text-whoop-gray/70 mt-2 text-sm">
+                      to achieve your {profile.fitness_goal?.replace("_", " ")}{" "}
+                      goal
                     </p>
                   </div>
                 )}
@@ -481,7 +484,7 @@ export default function ProfilePage() {
             {/* Save Button */}
             <button
               onClick={saveProfile}
-              className="w-full px-6 py-4 bg-gradient-to-r from-whoop-green to-whoop-cyan text-whoop-dark font-bold rounded-xl hover:scale-105 hover:shadow-glow transition-transform duration-200 disabled:bg-whoop-gray disabled:text-whoop-dark disabled:scale-100 disabled:shadow-none"
+              className="w-full px-6 py-4 bg-gradient-to-r from-whoop-green to-whoop-cyan text-whoop-dark font-bold rounded-lg hover:scale-105 hover:shadow-whoop-cyan/30 transition-all duration-200 disabled:bg-whoop-gray/50 disabled:text-whoop-dark/70 disabled:scale-100 disabled:shadow-none disabled:cursor-not-allowed"
               disabled={isLoading}
             >
               {isLoading ? "Saving..." : "Save Profile"}
