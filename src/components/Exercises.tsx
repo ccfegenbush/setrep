@@ -2,7 +2,7 @@
 
 import { supabase } from "@/lib/supabase";
 import { useState } from "react";
-import { FaPlus } from "react-icons/fa"; // Updated icon
+import { FaPlus } from "react-icons/fa";
 
 type Exercise = {
   id?: string;
@@ -77,7 +77,7 @@ export default function Exercises({
           ))
         )}
       </ul>
-      <div className="flex space-x-4 items-center">
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-center">
         <input
           type="text"
           placeholder="Exercise Name"
@@ -85,37 +85,39 @@ export default function Exercises({
           onChange={(e) =>
             setNewExercise({ ...newExercise, name: e.target.value })
           }
-          className="flex-grow p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray disabled:bg-whoop-gray/50"
+          className="w-full sm:flex-1 p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray disabled:bg-whoop-gray/50"
           disabled={isSaving}
         />
-        <input
-          type="number"
-          placeholder="lbs"
-          value={newExercise.weight || ""}
-          onChange={(e) =>
-            setNewExercise({ ...newExercise, weight: Number(e.target.value) })
-          }
-          className="p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray w-24 disabled:bg-whoop-gray/50"
-          disabled={isSaving}
-        />
-        <input
-          type="number"
-          placeholder="reps"
-          value={newExercise.reps || ""}
-          onChange={(e) =>
-            setNewExercise({ ...newExercise, reps: Number(e.target.value) })
-          }
-          className="p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray w-24 disabled:bg-whoop-gray/50"
-          disabled={isSaving}
-        />
-        <button
-          onClick={saveExercise}
-          className="p-4 bg-gradient-to-r from-whoop-green to-whoop-cyan text-whoop-dark rounded-xl hover:scale-105 hover:shadow-glow transition-transform duration-200 disabled:bg-whoop-gray disabled:scale-100 disabled:shadow-none"
-          disabled={isSaving}
-          aria-label="Add Exercise"
-        >
-          <FaPlus className="w-6 h-6" />
-        </button>
+        <div className="flex space-x-4 w-full sm:w-auto">
+          <input
+            type="number"
+            placeholder="lbs"
+            value={newExercise.weight || ""}
+            onChange={(e) =>
+              setNewExercise({ ...newExercise, weight: Number(e.target.value) })
+            }
+            className="w-24 p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray disabled:bg-whoop-gray/50"
+            disabled={isSaving}
+          />
+          <input
+            type="number"
+            placeholder="reps"
+            value={newExercise.reps || ""}
+            onChange={(e) =>
+              setNewExercise({ ...newExercise, reps: Number(e.target.value) })
+            }
+            className="w-24 p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray disabled:bg-whoop-gray/50"
+            disabled={isSaving}
+          />
+          <button
+            onClick={saveExercise}
+            className="p-3 bg-gradient-to-r from-whoop-green to-whoop-cyan text-whoop-dark rounded-xl hover:scale-105 hover:shadow-glow transition-transform duration-200 disabled:bg-whoop-gray disabled:scale-100 disabled:shadow-none flex-shrink-0"
+            disabled={isSaving}
+            aria-label="Add Exercise"
+          >
+            <FaPlus className="w-5 h-5" />
+          </button>
+        </div>
       </div>
     </div>
   );
