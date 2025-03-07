@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
+import { FaChartBar } from "react-icons/fa"; // Added for progress icon
 
 type Workout = {
   id: string;
@@ -27,7 +28,6 @@ export default function ProgressPage() {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // Fetch workout data on mount
   useEffect(() => {
     async function fetchWorkouts() {
       const {
@@ -55,12 +55,10 @@ export default function ProgressPage() {
     fetchWorkouts();
   }, [router]);
 
-  // Get unique exercises sorted alphabetically
   const uniqueExercises = Array.from(
     new Set(allWorkouts.flatMap((w) => w.exercises.map((e) => e.name)))
   ).sort();
 
-  // Get exercise history sorted by most recent first
   const getExerciseHistory = (exerciseName: string) => {
     const history = allWorkouts
       .flatMap((w) =>
@@ -79,10 +77,9 @@ export default function ProgressPage() {
     return history;
   };
 
-  // Calculate net strength gain
   const calculateStrengthGain = (exerciseName: string) => {
     const history = getExerciseHistory(exerciseName);
-    if (history.length < 2) return 0; // Need at least 2 entries for comparison
+    if (history.length < 2) return 0;
 
     const earliest = history[history.length - 1];
     const latest = history[0];
@@ -92,28 +89,31 @@ export default function ProgressPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-whoop-dark text-whoop-white">
       <Header />
-      <main className="max-w-4xl mx-auto p-6">
+      <main className="max-w-6xl mx-auto p-6 md:p-10">
         {isLoading ? (
-          <div className="bg-white shadow-md rounded-lg p-4 text-center min-h-[100px] flex items-center justify-center">
-            <div className="text-gray-700">Loading...</div>
+          <div className="bg-whoop-card rounded-2xl p-6 shadow-lg shadow-glow border border-whoop-cyan/20 text-center min-h-[100px] flex items-center justify-center">
+            <div className="text-whoop-gray">Loading...</div>
           </div>
         ) : (
           <>
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">
-              Exercise Progress
-            </h2>
+            <div className="flex items-center mb-8">
+              <FaChartBar className="text-whoop-green text-4xl mr-3" />
+              <h2 className="text-4xl font-bold tracking-tight">
+                Exercise Progress
+              </h2>
+            </div>
 
             {viewState === "all" ? (
               <ul className="space-y-4">
                 {uniqueExercises.map((exerciseName) => (
                   <li
                     key={exerciseName}
-                    className="bg-white shadow-md rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="bg-whoop-card rounded-xl p-4 cursor-pointer hover:bg-whoop-dark hover:shadow-glow transition-all duration-200 border border-whoop-cyan/30"
                     onClick={() => setViewState({ exerciseName })}
                   >
-                    <div className="text-lg font-semibold text-gray-800">
+                    <div className="text-lg font-semibold text-whoop-white">
                       {exerciseName}
                     </div>
                   </li>
@@ -121,18 +121,18 @@ export default function ProgressPage() {
               </ul>
             ) : (
               <>
-                <div className="mb-6">
+                <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:space-x-6 space-y-4 sm:space-y-0">
                   <button
                     onClick={() => setViewState("all")}
-                    className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors mr-4"
+                    className="px-4 py-2 bg-gradient-to-r from-whoop-cyan to-whoop-dark text-whoop-white font-semibold rounded-xl hover:scale-105 hover:shadow-glow transition-transform duration-200"
                   >
                     Back to Exercises
                   </button>
                   <span
                     className={`text-xl font-semibold ${
                       calculateStrengthGain(viewState.exerciseName) >= 0
-                        ? "text-green-600"
-                        : "text-red-600"
+                        ? "text-whoop-green"
+                        : "text-red-400"
                     }`}
                   >
                     Net Strength Gain:{" "}
@@ -143,13 +143,13 @@ export default function ProgressPage() {
                   {getExerciseHistory(viewState.exerciseName).map((entry) => (
                     <li
                       key={entry.id}
-                      className="bg-white shadow-md rounded-lg p-4"
+                      className="bg-whoop-card rounded-xl p-4 border border-whoop-cyan/20 shadow-md"
                     >
-                      <div className="text-lg font-semibold text-gray-800">
+                      <div className="text-lg font-semibold text-whoop-white">
                         {new Date(entry.created_at).toLocaleDateString()} -{" "}
                         {entry.workoutName}
                       </div>
-                      <div className="text-gray-700 mt-2">
+                      <div className="text-whoop-gray mt-2">
                         {entry.weight || "N/A"} lbs x {entry.reps || "N/A"} reps
                       </div>
                     </li>

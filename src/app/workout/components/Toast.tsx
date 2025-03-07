@@ -17,8 +17,8 @@ export default function Toast({ message, isVisible, onClose }: ToastProps) {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      <div className="bg-green-500 text-white px-4 py-2 rounded-md shadow-lg animate-fade-in-out">
+    <div className="fixed bottom-6 right-6 z-50">
+      <div className="bg-gradient-to-r from-whoop-green to-whoop-cyan text-whoop-dark px-6 py-3 rounded-xl shadow-lg shadow-glow border border-whoop-green/50 animate-fade-in-out font-semibold">
         {message}
       </div>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { FaPlay, FaStop } from "react-icons/fa"; // Added icons
 
 export default function RestTimer() {
   const [time, setTime] = useState(0);
@@ -10,7 +11,7 @@ export default function RestTimer() {
     let timer: NodeJS.Timeout;
     if (isRunning) {
       timer = setInterval(() => {
-        setTime((prev) => prev + 1); // Increment time every second
+        setTime((prev) => prev + 1);
       }, 1000);
     }
     return () => clearInterval(timer);
@@ -18,30 +19,36 @@ export default function RestTimer() {
 
   const toggleTimer = () => {
     if (isRunning) {
-      setIsRunning(false); // Stop the timer
-      setTime(0); // Reset to zero
+      setIsRunning(false);
+      setTime(0);
     } else {
-      setIsRunning(true); // Start counting up from current time (0 if reset)
+      setIsRunning(true);
     }
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 mt-4">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">Rest</h2>
+    <div className="bg-whoop-card rounded-2xl p-6 mt-6 shadow-lg shadow-glow border border-whoop-cyan/20">
+      <h2 className="text-xl font-semibold text-whoop-white mb-4">Rest</h2>
       <div className="flex justify-center space-x-8">
         <div className="flex-1 flex justify-center">
-          <div className="text-5xl font-mono text-gray-700">{time}s</div>
+          <div className="text-5xl font-mono font-bold text-whoop-green tracking-wider">
+            {time}s
+          </div>
         </div>
         <div className="flex-1 flex justify-center">
           <button
             onClick={toggleTimer}
-            className={`px-6 py-3 text-white rounded-md hover:${
-              isRunning ? "bg-red-700" : "bg-green-700"
-            } transition-colors font-semibold text-lg ${
-              isRunning ? "bg-red-600" : "bg-green-600"
+            className={`px-6 py-4 text-whoop-dark font-bold rounded-xl transition-transform duration-200 hover:scale-105 hover:shadow-glow ${
+              isRunning
+                ? "bg-gradient-to-r from-red-600 to-red-800"
+                : "bg-gradient-to-r from-whoop-green to-whoop-cyan"
             }`}
           >
-            {isRunning ? "End" : "Start"}
+            {isRunning ? (
+              <FaStop className="w-6 h-6" />
+            ) : (
+              <FaPlay className="w-6 h-6" />
+            )}
           </button>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import PlanItem from "@/components/PlanItem";
 import { useState } from "react";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa"; // Added icons for toggle
 
 type Plan = {
   id: string;
@@ -27,9 +28,9 @@ export default function PreviousWorkouts({
   const [showPreviousWorkouts, setShowPreviousWorkouts] = useState(true);
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6">
-      <h2
-        className="text-2xl font-semibold text-gray-800 mb-4 cursor-pointer hover:text-gray-600 transition-colors"
+    <div className="bg-whoop-card rounded-2xl p-6 shadow-lg shadow-glow border border-whoop-cyan/20">
+      <div
+        className="flex items-center justify-between mb-6 cursor-pointer hover:text-whoop-green transition-colors"
         onClick={() => setShowPreviousWorkouts(!showPreviousWorkouts)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -40,16 +41,23 @@ export default function PreviousWorkouts({
         role="button"
         tabIndex={0}
       >
-        Previous Workouts
-      </h2>
+        <h2 className="text-2xl font-bold text-whoop-white tracking-tight">
+          Previous Workouts
+        </h2>
+        {showPreviousWorkouts ? (
+          <FaChevronUp className="text-whoop-gray text-xl" />
+        ) : (
+          <FaChevronDown className="text-whoop-gray text-xl" />
+        )}
+      </div>
       {showPreviousWorkouts && (
         <>
           {plans.length === 0 ? (
-            <p className="text-gray-600 mb-6">
+            <p className="text-whoop-gray mb-6">
               No previous workout plans saved.
             </p>
           ) : (
-            <ul className="max-h-96 overflow-y-scroll space-y-3 mb-6">
+            <ul className="max-h-96 overflow-y-scroll space-y-4 mb-6 scrollbar-thin scrollbar-thumb-whoop-cyan scrollbar-track-whoop-dark">
               {plans.map((plan) => (
                 <PlanItem
                   key={plan.id}
@@ -65,14 +73,14 @@ export default function PreviousWorkouts({
       )}
       <button
         onClick={onStartWorkout}
-        className="w-full px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 transition-colors text-lg font-semibold"
+        className="w-full px-6 py-4 bg-gradient-to-r from-whoop-green to-whoop-cyan text-whoop-dark font-bold rounded-xl hover:scale-105 hover:shadow-glow transition-transform duration-200 disabled:bg-whoop-gray disabled:text-whoop-dark disabled:scale-100 disabled:shadow-none"
         disabled={isStartingWorkout}
       >
         {isStartingWorkout ? "Starting..." : "Start New Workout"}
       </button>
       <div className="mt-4">
         <Link href="/progress">
-          <button className="w-full px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-lg font-semibold">
+          <button className="w-full px-6 py-4 bg-gradient-to-r from-whoop-cyan to-whoop-dark text-whoop-white font-bold rounded-xl hover:scale-105 hover:shadow-glow transition-transform duration-200">
             View Progress
           </button>
         </Link>

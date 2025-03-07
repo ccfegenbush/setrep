@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSwipeable } from "react-swipeable";
-import { TrashIcon } from "@heroicons/react/24/solid";
+import { FaTrash } from "react-icons/fa";
 
 type Plan = {
   id: string;
@@ -44,21 +44,25 @@ const PlanItem: React.FC<PlanItemProps> = ({
   });
 
   const transform = `translateX(-${swipeProgress}px)`;
+  const deleteOpacity = swipeProgress / 100; // Opacity scales from 0 to 1 as swipe progresses
 
   return (
-    <li className="relative overflow-hidden rounded-md shadow-sm">
-      <div className="absolute inset-0 flex items-center justify-end pr-4 bg-red-600">
-        <TrashIcon className="w-6 h-6 text-white" />
+    <li className="relative overflow-hidden rounded-xl shadow-md border border-whoop-cyan/20">
+      <div
+        className="absolute inset-0 flex items-center justify-end pr-4 bg-red-600 transition-opacity duration-100"
+        style={{ opacity: deleteOpacity }} // Red background fades in with swipe
+      >
+        <FaTrash className="w-6 h-6 text-whoop-white" />
       </div>
       <div
         {...swipeHandlers}
-        className="flex justify-between items-center bg-gray-50 p-3 transition-transform duration-100"
+        className="flex justify-between items-center bg-whoop-dark p-4 transition-transform duration-100 relative z-10"
         style={{ transform }}
       >
-        <span className="text-gray-700 font-medium">{plan.name}</span>
+        <span className="text-whoop-white font-semibold">{plan.name}</span>
         <button
           onClick={() => onStart(plan.id)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+          className="px-4 py-2 bg-gradient-to-r from-whoop-green to-whoop-cyan text-whoop-dark font-semibold rounded-xl hover:scale-105 hover:shadow-glow transition-transform duration-200 disabled:bg-whoop-gray disabled:scale-100 disabled:shadow-none"
           disabled={isStartingWorkout}
         >
           {isStartingWorkout ? "Starting..." : "Start"}

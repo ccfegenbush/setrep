@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
+import { FaUser } from "react-icons/fa";
 
 type Profile = {
   full_name: string | null;
@@ -222,22 +223,25 @@ export default function ProfilePage() {
   const tdee = calculateTDEE();
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-whoop-dark text-whoop-white">
       <Header />
-      <main className="max-w-4xl mx-auto p-6">
+      <main className="max-w-6xl mx-auto p-6 md:p-10">
         {isLoading ? (
-          <div className="bg-white shadow-md rounded-lg p-4 text-center min-h-[100px] flex items-center justify-center">
-            <div className="text-gray-700">Loading...</div>
+          <div className="bg-whoop-card rounded-2xl p-6 shadow-lg shadow-glow border border-whoop-cyan/20 text-center min-h-[100px] flex items-center justify-center">
+            <div className="text-whoop-gray">Loading...</div>
           </div>
         ) : (
-          <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">
-              Your Profile
-            </h2>
+          <div className="bg-whoop-card rounded-2xl p-6 shadow-lg shadow-glow border border-whoop-cyan/20">
+            <div className="flex items-center mb-8">
+              <FaUser className="text-whoop-green text-3xl mr-3" />
+              <h2 className="text-4xl font-bold tracking-tight">
+                Your Profile
+              </h2>
+            </div>
 
             {/* Contact Info */}
-            <section className="mb-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <section className="mb-8">
+              <h3 className="text-2xl font-semibold text-whoop-white mb-4">
                 Contact Information
               </h3>
               <div className="space-y-4">
@@ -248,7 +252,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setProfile({ ...profile, full_name: e.target.value })
                   }
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray"
                 />
                 <input
                   type="email"
@@ -257,7 +261,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setProfile({ ...profile, email: e.target.value })
                   }
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray"
                 />
                 <input
                   type="tel"
@@ -266,17 +270,17 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setProfile({ ...profile, phone_number: e.target.value })
                   }
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray"
                 />
               </div>
             </section>
 
             {/* Personal Details */}
-            <section className="mb-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <section className="mb-8">
+              <h3 className="text-2xl font-semibold text-whoop-white mb-4">
                 Personal Details
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <select
                   value={profile.gender || ""}
                   onChange={(e) =>
@@ -285,23 +289,27 @@ export default function ProfilePage() {
                       gender: e.target.value as "male" | "female",
                     })
                   }
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
                 >
-                  <option value="">Select Gender</option>
+                  <option value="" className="text-whoop-gray">
+                    Select Gender
+                  </option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                 </select>
                 <div>
-                  <p className="block text-sm font-medium text-gray-700 mb-1">
+                  <p className="text-sm font-semibold text-whoop-gray mb-2">
                     Date of Birth
                   </p>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-4">
                     <select
                       value={dobMonth}
                       onChange={(e) => setDobMonth(e.target.value)}
-                      className="w-1/3 p-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-1/3 p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
                     >
-                      <option value="">Month</option>
+                      <option value="" className="text-whoop-gray">
+                        Month
+                      </option>
                       {Array.from({ length: 12 }, (_, i) => i + 1).map(
                         (month) => (
                           <option key={month} value={month}>
@@ -315,9 +323,11 @@ export default function ProfilePage() {
                     <select
                       value={dobDay}
                       onChange={(e) => setDobDay(e.target.value)}
-                      className="w-1/3 p-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-1/3 p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
                     >
-                      <option value="">Day</option>
+                      <option value="" className="text-whoop-gray">
+                        Day
+                      </option>
                       {Array.from({ length: 31 }, (_, i) => i + 1).map(
                         (day) => (
                           <option key={day} value={day}>
@@ -329,9 +339,11 @@ export default function ProfilePage() {
                     <select
                       value={dobYear}
                       onChange={(e) => setDobYear(e.target.value)}
-                      className="w-1/3 p-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-1/3 p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
                     >
-                      <option value="">Year</option>
+                      <option value="" className="text-whoop-gray">
+                        Year
+                      </option>
                       {Array.from(
                         { length: endYear - startYear + 1 },
                         (_, i) => endYear - i
@@ -344,16 +356,18 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <div>
-                  <p className="block text-sm font-medium text-gray-700 mb-1">
+                  <p className="text-sm font-semibold text-whoop-gray mb-2">
                     Height
                   </p>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-4">
                     <select
                       value={heightFeet}
                       onChange={(e) => setHeightFeet(e.target.value)}
-                      className="w-1/2 p-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-1/2 p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
                     >
-                      <option value="">Feet</option>
+                      <option value="" className="text-whoop-gray">
+                        Feet
+                      </option>
                       {Array.from({ length: 4 }, (_, i) => i + 4).map((ft) => (
                         <option key={ft} value={ft}>
                           {ft} ft
@@ -363,9 +377,11 @@ export default function ProfilePage() {
                     <select
                       value={heightInches}
                       onChange={(e) => setHeightInches(e.target.value)}
-                      className="w-1/2 p-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-1/2 p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
                     >
-                      <option value="">Inches</option>
+                      <option value="" className="text-whoop-gray">
+                        Inches
+                      </option>
                       {Array.from({ length: 12 }, (_, i) => i).map((inch) => (
                         <option key={inch} value={inch}>
                           {inch} in
@@ -379,17 +395,17 @@ export default function ProfilePage() {
                   placeholder="Weight (lb)"
                   value={startingWeight}
                   onChange={(e) => setStartingWeight(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray"
                 />
               </div>
             </section>
 
             {/* Fitness Goal */}
-            <section className="mb-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <section className="mb-8">
+              <h3 className="text-2xl font-semibold text-whoop-white mb-4">
                 Fitness Goal
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <select
                   value={profile.fitness_goal || ""}
                   onChange={(e) =>
@@ -398,9 +414,11 @@ export default function ProfilePage() {
                       fitness_goal: e.target.value as any,
                     })
                   }
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
                 >
-                  <option value="">Select Goal</option>
+                  <option value="" className="text-whoop-gray">
+                    Select Goal
+                  </option>
                   <option value="muscle_gain">Put on Muscle</option>
                   <option value="maintenance">Maintain</option>
                   <option value="fat_loss">Burn Fat</option>
@@ -413,9 +431,11 @@ export default function ProfilePage() {
                       activity_level: e.target.value as any,
                     })
                   }
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green"
                 >
-                  <option value="">Select Activity Level</option>
+                  <option value="" className="text-whoop-gray">
+                    Select Activity Level
+                  </option>
                   <option value="sedentary">
                     Sedentary (little to no exercise)
                   </option>
@@ -433,16 +453,16 @@ export default function ProfilePage() {
                   </option>
                 </select>
                 {tdee && (
-                  <div className="mt-4">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-2 text-center">
+                  <div className="bg-gradient-to-r from-whoop-dark to-whoop-card p-6 rounded-xl border border-whoop-green/30 text-center">
+                    <h4 className="text-lg font-semibold text-whoop-gray mb-2">
                       Target Daily Calorie Intake
                     </h4>
                     <div className="flex justify-center">
-                      <span className="text-5xl font-bold text-gray-900">
+                      <span className="text-5xl font-bold text-whoop-green">
                         {tdee}
                       </span>
                     </div>
-                    <p className="text-gray-700 text-center mt-2">
+                    <p className="text-whoop-gray mt-2">
                       calories to achieve your{" "}
                       {profile.fitness_goal?.replace("_", " ")} goal
                     </p>
@@ -454,7 +474,7 @@ export default function ProfilePage() {
             {/* Save Button */}
             <button
               onClick={saveProfile}
-              className="w-full px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-lg font-semibold"
+              className="w-full px-6 py-4 bg-gradient-to-r from-whoop-green to-whoop-cyan text-whoop-dark font-bold rounded-xl hover:scale-105 hover:shadow-glow transition-transform duration-200 disabled:bg-whoop-gray disabled:text-whoop-dark disabled:scale-100 disabled:shadow-none"
               disabled={isLoading}
             >
               {isLoading ? "Saving..." : "Save Profile"}

@@ -2,7 +2,7 @@
 
 import { supabase } from "@/lib/supabase";
 import { useState } from "react";
-import { PlusIcon } from "@heroicons/react/24/solid";
+import { FaPlus } from "react-icons/fa"; // Updated icon
 
 type Exercise = {
   id?: string;
@@ -59,16 +59,18 @@ export default function Exercises({
   }
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">Exercises</h2>
-      <ul className="space-y-2 mb-6">
+    <div className="bg-whoop-card rounded-2xl p-6 shadow-lg shadow-glow border border-whoop-cyan/20">
+      <h2 className="text-2xl font-semibold text-whoop-white mb-4">
+        Exercises
+      </h2>
+      <ul className="space-y-3 mb-6">
         {exercises.length === 0 ? (
-          <li className="text-gray-600">No exercises added yet.</li>
+          <li className="text-whoop-gray">No exercises added yet.</li>
         ) : (
           exercises.map((ex, index) => (
             <li
               key={ex.id || index}
-              className="bg-gray-50 p-3 rounded-md text-gray-700"
+              className="bg-whoop-dark p-3 rounded-xl text-whoop-white border border-whoop-cyan/30"
             >
               {ex.name}: {ex.weight}lbs x {ex.reps} reps
             </li>
@@ -83,7 +85,7 @@ export default function Exercises({
           onChange={(e) =>
             setNewExercise({ ...newExercise, name: e.target.value })
           }
-          className="flex-grow p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+          className="flex-grow p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray disabled:bg-whoop-gray/50"
           disabled={isSaving}
         />
         <input
@@ -93,7 +95,7 @@ export default function Exercises({
           onChange={(e) =>
             setNewExercise({ ...newExercise, weight: Number(e.target.value) })
           }
-          className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 w-24"
+          className="p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray w-24 disabled:bg-whoop-gray/50"
           disabled={isSaving}
         />
         <input
@@ -103,16 +105,16 @@ export default function Exercises({
           onChange={(e) =>
             setNewExercise({ ...newExercise, reps: Number(e.target.value) })
           }
-          className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 w-24"
+          className="p-4 bg-whoop-dark text-whoop-white border border-whoop-cyan/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-whoop-green placeholder-whoop-gray w-24 disabled:bg-whoop-gray/50"
           disabled={isSaving}
         />
         <button
           onClick={saveExercise}
-          className="p-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+          className="p-4 bg-gradient-to-r from-whoop-green to-whoop-cyan text-whoop-dark rounded-xl hover:scale-105 hover:shadow-glow transition-transform duration-200 disabled:bg-whoop-gray disabled:scale-100 disabled:shadow-none"
           disabled={isSaving}
           aria-label="Add Exercise"
         >
-          <PlusIcon className="w-6 h-6" />
+          <FaPlus className="w-6 h-6" />
         </button>
       </div>
     </div>
